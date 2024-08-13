@@ -23,3 +23,28 @@ This Python script allows you to enumerate the possible user attributes that can
    git clone https://github.com/punishell/CognitoAttributeEnum.git
    cd cognito-attribute-enumeration
    ```
+
+## Usage
+
+```
+$ python cognito-attribute-enu.py -client_id 16f1g98bfuj9i0g3f8be36kkrl 
+Using default attributes
+Testing attributes using client_id: 16f1g98bfuj9i0g3f8be36kkrl
+[+] email: Success (Username: testuser_email_1723574859)
+[-] phone_number: Not authorized
+[+] name: Success (Username: testuser_name_1723574860)
+[-] given_name: Not authorized
+[-] family_name: Not authorized
+[-] preferred_username: Not authorized
+[-] address: Not authorized
+[-] birthdate: Not authorized
+[-] gender: Not authorized
+[-] locale: Not authorized
+[-] middle_name: Not authorized
+[-] nickname: Not authorized
+[-] picture: Not authorized
+[-] profile: Not authorized
+[-] updated_at: Not authorized
+[-] website: Not authorized
+[-] zoneinfo: Not authorized
+```
