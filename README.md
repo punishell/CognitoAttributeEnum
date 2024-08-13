@@ -20,6 +20,6 @@ This Python script allows you to enumerate the possible user attributes that can
 1. **Clone the repository** (if applicable):
 
    ```bash
-   git clone https://github.com/your-repo/cognito-attribute-enumeration.git
+   git clone https://github.com/punishell/CognitoAttributeEnum.git
    cd cognito-attribute-enumeration
    ```
