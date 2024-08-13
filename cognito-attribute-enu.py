@@ -2,9 +2,14 @@ import boto3
 from botocore.exceptions import ClientError
 import argparse
 import time
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich import box
 
-# Initialize Cognito IDP client
+# Initialize Cognito IDP client and rich console
 client = boto3.client('cognito-idp')
+console = Console()
 
 # Default list of attributes to test
 default_attributes = [
@@ -58,17 +63,22 @@ def test_attribute(client_id, attribute):
                 {'Name': 'email', 'Value': f'test_{attribute}@example.com'}  # Required email attribute
             ]
         )
-        print(f"[+] {attribute}: Success (Username: {username})")
+        console.print(f"[+] {attribute}: Success (Username: {username})", style="bold green")
+        return "Success"
     except ClientError as e:
         error_message = str(e)
         if "NotAuthorizedException" in error_message:
-            print(f"[-] {attribute}: Not authorized")
+            console.print(f"[-] {attribute}: Not authorized", style="bold red")
+            return "Not authorized"
         elif "InvalidParameterException" in error_message:
-            print(f"[-] {attribute}: Invalid parameter")
+            console.print(f"[-] {attribute}: Invalid parameter", style="bold yellow")
+            return "Invalid parameter"
         elif "UsernameExistsException" in error_message:
-            print(f"[-] {attribute}: User already exists")
+            console.print(f"[-] {attribute}: User already exists", style="bold magenta")
+            return "User already exists"
         else:
-            print(f"[-] {attribute}: {error_message}")
+            console.print(f"[-] {attribute}: {error_message}", style="bold red")
+            return error_message
 
 # Main function
 if __name__ == "__main__":
@@ -78,13 +88,22 @@ if __name__ == "__main__":
     # Determine which attributes to test: from file or default
     if args.attributes:
         attributes_to_test = read_attributes(args.attributes)
-        print(f"Using attributes from file: {args.attributes}")
+        console.print(f"[+] Using attributes from file: {args.attributes}", style="bold blue")
     else:
         attributes_to_test = default_attributes
-        print("Using default attributes")
+        console.print("[+] Using default attributes", style="bold blue")
+
+    # Prepare the result table
+    table = Table(title="Cognito User Attribute Enumeration Results", box=box.DOUBLE)
+    table.add_column("Attribute", style="cyan", no_wrap=True)
+    table.add_column("Result", style="magenta")
+    table.add_column("Details", style="green")
 
     # Enumerate possible attributes
-    print(f"Testing attributes using client_id: {args.client_id}")
-    for attribute in attributes_to_test:
-        test_attribute(args.client_id, attribute)
+    console.print(Panel.fit(f"Testing attributes using client_id: [bold yellow]{args.client_id}[/bold yellow]", box=box.DOUBLE))
 
+    for attribute in attributes_to_test:
+        result = test_attribute(args.client_id, attribute)
+        table.add_row(attribute, result, f"Username: {generate_username(attribute)}")
+
+    console.print(table)
